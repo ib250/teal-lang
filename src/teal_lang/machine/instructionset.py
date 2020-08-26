@@ -177,6 +177,14 @@ class LessThan(I):
     pass
 
 
+class GreaterThanOrEqual(I):
+    pass
+
+
+class LessThanOrEqual(I):
+    pass
+
+
 class OpAnd(I):
     pass
 
@@ -250,6 +258,10 @@ class ParseFloat(I):
 
 class Plus(I):
     """Add the top two elements on the stack"""
+
+
+class Minus(I):
+    """Subtract the top two elements on the stack"""
 
 
 class Multiply(I):

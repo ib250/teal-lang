@@ -95,7 +95,7 @@ class TlMachine:
         "nth": Nth,
         "==": Eq,
         "+": Plus,
-        # "-": Minus
+        "-": Minus,
         "*": Multiply,
         ">": GreaterThan,
         "<": LessThan,
@@ -538,6 +538,13 @@ class TlMachine:
         b = self.state.ds_pop()
         cls = new_number_type(a, b)
         self.state.ds_push(cls(a + b))
+
+    @evali.register
+    def _(self, i: Minus):
+        a = self.state.ds_pop()
+        b = self.state.ds_pop()
+        cls = new_number_type(a, b)
+        self.state.ds_push(cls(a - b))
 
     @evali.register
     def _(self, i: Multiply):

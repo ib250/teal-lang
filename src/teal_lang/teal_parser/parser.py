@@ -50,8 +50,8 @@ class TealLexer(Lexer):
         LAMBDA,
         IF,
         ELSE,
-        ASYNC,
-        AWAIT,
+        # ASYNC,
+        # AWAIT,
         TRUE,
         FALSE,
         # values
@@ -59,15 +59,24 @@ class TealLexer(Lexer):
         STRING,
         SQ_STRING,
         NULL,
-        # operators
+        # unary ops
+        ASYNC,
+        AWAIT,
+        NOT,
+        # NEG
+        # binary operators
+        AND,
+        OR,
         ADD,
         SUB,
         MUL,
         DIV,
-        AND,
-        OR,
+        MOD,
         EQ,
+        NEQ,
+        GTE,
         GT,
+        LTE,
         LT,
         SET,  # must come after EQ
     }
@@ -101,11 +110,12 @@ class TealLexer(Lexer):
     ID["true"] = TRUE
     ID["false"] = FALSE
     ID["null"] = NULL
+    ID["not"] = NOT
 
     SYMBOL = r":[a-z][a-zA-Z0-9_]*"
 
     # values
-    NUMBER = r"[+-]?[\d]+[\d.]*"
+    NUMBER = r"[\d]+[\d.]*"
     STRING = r'"(?:[^"\\]|\\.)*"'
     SQ_STRING = r"'(?:[^'\\]|\\.)*'"
 
@@ -114,10 +124,14 @@ class TealLexer(Lexer):
     SUB = r"-"
     MUL = r"\*"
     DIV = r"/"
+    MOD = r"%"
     EQ = r"=="
+    NEQ = r"!="
     SET = r"="
     AND = r"&&"
+    GTE = r">="
     GT = r">"
+    LTE = r"<="
     LT = r"<"
     OR = r"\|\|"
 
@@ -196,15 +210,15 @@ class TealParser(Parser):
 
     tokens = TealLexer.tokens
     precedence = (
-        ("nonassoc", LT, GT),
+        ("right", LTE, GTE),
+        ("right", LT, GT),
         ("right", OR),
         ("right", AND),
         ("nonassoc", EQ, SET),
         ("left", ADD, SUB),
-        ("left", MUL, DIV),
-        ("right", AWAIT),
+        ("left", MUL, DIV, MOD),
         ("right", "("),
-        ("right", ASYNC),
+        ("right", ASYNC, AWAIT, NOT),
     )
 
     start = "top"
@@ -279,7 +293,9 @@ class TealParser(Parser):
     def block_expr(self, p):
         if not p.expressions:
             # TODO parser error framework
-            raise Exception("Empty block expression")
+            raise TealParseError(
+                "Empty block expression", self.filename, self.source_text, p
+            )
         return N(self, p, n.N_Progn, p.expressions)
 
     # function call
@@ -348,32 +364,34 @@ class TealParser(Parser):
         nothing = N(self, p, n.N_Literal, None)
         return N(self, p, n.N_Progn, [nothing])
 
-    # async/await
-
-    @_("ASYNC expr")
-    def expr(self, p):
-        return N(self, p, n.N_Async, p.expr)
-
-    @_("AWAIT expr")
-    def expr(self, p):
-        return N(self, p, n.N_Await, p.expr)
-
     # binops
 
     @_(
+        "expr GTE expr",
         "expr GT expr",
+        "expr LTE expr",
         "expr LT expr",
         "expr ADD expr",
         "expr SUB expr",
         "expr MUL expr",
         "expr DIV expr",
+        "expr MOD expr",
         "expr AND expr",
         "expr OR expr",
         "expr EQ expr",
+        "expr NEQ expr",
         "expr SET expr",
     )
     def expr(self, p):
         return N(self, p, n.N_Binop, p[0], p[1], p[2])
+
+    # unaryops
+
+    @_(
+        "SUB expr", "NOT expr", "ASYNC expr", "AWAIT expr",
+    )
+    def expr(self, p):
+        return N(self, p, n.N_UnaryOp, p[0], p[1])
 
     # compound
 

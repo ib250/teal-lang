@@ -68,6 +68,12 @@ class N_Binop(Node):
 
 
 @dataclass
+class N_UnaryOp(Node):
+    op: str
+    rhs: Any
+
+
+@dataclass
 class N_If(Node):
     cond: Any
     then: list
