@@ -17,7 +17,7 @@ from teal_lang.teal_parser import parser, nodes
         ("/binop/gte", "x >= 1", ">="),
         ("/binop/lte", "x <= 1", "<="),
         ("/binop/eq", "x == 1", "=="),
-        ("/binop/eq", "x != 1", "!="),
+        ("/binop/neq", "x != 1", "!="),
         ("/binop/and", "x && 1", "&&"),
         ("/binop/or", "x || 1", "||"),
     ],
@@ -37,7 +37,7 @@ def test_binop(test_case, source, op):
         ("/unaryop/neg", "-x", "-"),
         ("/unaryop/await", "- await foo(1, 2, 3)", "-"),
         ("/unaryop/async", "async (- foo(1, 2, 3) + 1)", "async"),
-        ("/unaryop/not", "not await (foo(1) + 1)", "not"),
+        ("/unaryop/not", "!await (foo(1) + 1)", "!"),
     ],
 )
 def test_unaryop(test_case, source, op):

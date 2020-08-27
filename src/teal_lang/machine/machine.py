@@ -94,11 +94,15 @@ class TlMachine:
         "set": HSet,
         "nth": Nth,
         "==": Eq,
+        "!=": NEq,
         "+": Plus,
         "-": Minus,
         "*": Multiply,
+        "%": Modulo,
         ">": GreaterThan,
+        ">=": GreaterThanOrEqual,
         "<": LessThan,
+        "<=": LessThanOrEqual,
         "&&": OpAnd,
         "||": OpOr,
         "parse_float": ParseFloat,
@@ -597,6 +601,35 @@ class TlMachine:
         self.state.ds_push(
             tl_bool(isinstance(a, mt.TlTrue) or isinstance(b, mt.TlTrue))
         )
+
+    @evali.register
+    def _(self, i: Neg):
+        a = self.state.ds_pop()
+        self.state.ds_push(tl_bool(not a))
+
+    @evali.register
+    def _(self, i: NEq):
+        a = self.state.ds_pop()
+        b = self.state.ds_pop()
+        self.state.ds_push(tl_bool(a != b))
+
+    @evali.register
+    def _(self, i: GreaterThanOrEqual):
+        a = self.state.ds_pop()
+        b = self.state.ds_pop()
+        self.state.ds_push(tl_bool(a >= b))
+
+    @evali.register
+    def _(self, i: LessThanOrEqual):
+        a = self.state.ds_pop()
+        b = self.state.ds_pop()
+        self.state.ds_push(tl_bool(a <= b))
+
+    @evali.register
+    def _(self, i: Modulo):
+        a = self.state.ds_pop()
+        b = self.state.ds_pop()
+        self.state.ds_push(mt.TlInt(a % b))
 
     @evali.register
     def _(self, i: ParseFloat):

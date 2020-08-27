@@ -59,10 +59,6 @@ class TealLexer(Lexer):
         STRING,
         SQ_STRING,
         NULL,
-        # unary ops
-        ASYNC,
-        AWAIT,
-        NOT,
         # NEG
         # binary operators
         AND,
@@ -72,13 +68,17 @@ class TealLexer(Lexer):
         MUL,
         DIV,
         MOD,
-        EQ,
         NEQ,
+        EQ,
         GTE,
         GT,
         LTE,
         LT,
         SET,  # must come after EQ
+        # unary ops
+        ASYNC,
+        AWAIT,
+        NOT,
     }
     literals = {"(", ")", ",", "{", "}", "[", "]", ":"}
 
@@ -110,7 +110,6 @@ class TealLexer(Lexer):
     ID["true"] = TRUE
     ID["false"] = FALSE
     ID["null"] = NULL
-    ID["not"] = NOT
 
     SYMBOL = r":[a-z][a-zA-Z0-9_]*"
 
@@ -134,6 +133,7 @@ class TealLexer(Lexer):
     LTE = r"<="
     LT = r"<"
     OR = r"\|\|"
+    NOT = r"!"
 
     TERM = r";+"
 
@@ -210,15 +210,15 @@ class TealParser(Parser):
 
     tokens = TealLexer.tokens
     precedence = (
+        ("right", NEQ),
+        ("right", ASYNC, AWAIT, NOT),
         ("right", LTE, GTE),
         ("right", LT, GT),
-        ("right", OR),
-        ("right", AND),
+        ("right", AND, OR),
         ("nonassoc", EQ, SET),
         ("left", ADD, SUB),
         ("left", MUL, DIV, MOD),
         ("right", "("),
-        ("right", ASYNC, AWAIT, NOT),
     )
 
     start = "top"
@@ -378,8 +378,8 @@ class TealParser(Parser):
         "expr MOD expr",
         "expr AND expr",
         "expr OR expr",
-        "expr EQ expr",
         "expr NEQ expr",
+        "expr EQ expr",
         "expr SET expr",
     )
     def expr(self, p):

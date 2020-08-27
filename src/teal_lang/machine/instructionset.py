@@ -169,6 +169,10 @@ class Eq(I):
     """Check whether the top two items on the stack are equal"""
 
 
+class NEq(I):
+    pass
+
+
 class GreaterThan(I):
     pass
 
@@ -190,6 +194,11 @@ class OpAnd(I):
 
 
 class OpOr(I):
+    pass
+
+
+
+class Neg(I):
     pass
 
 
@@ -266,6 +275,10 @@ class Minus(I):
 
 class Multiply(I):
     """Multiple the top two elements on the stack"""
+
+
+class Modulo(I):
+    pass
 
 
 ##± Input-Output ±##############################################################

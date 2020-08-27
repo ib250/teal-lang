@@ -51,16 +51,6 @@ class N_Call(Node):
 
 
 @dataclass
-class N_Async(Node):
-    expr: str
-
-
-@dataclass
-class N_Await(Node):
-    expr: list
-
-
-@dataclass
 class N_Binop(Node):
     lhs: Any
     op: str
