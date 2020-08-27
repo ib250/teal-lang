@@ -253,7 +253,6 @@ class CompileToplevel:
         # TODO optional arguments...
         return self.compile_expr(n.value)
 
-
     @compile_expr.register
     def _(self, n: nodes.N_If):
         cond_code = self.compile_expr(n.cond)
@@ -299,9 +298,7 @@ class CompileToplevel:
             return self._compile_boolean_negation(n.rhs)
         elif n.op == "-":
             return self._compile_negation_expr(n.rhs)
-        raise ValueError(
-            f"Unrecognised unary expression {expr}"
-        )
+        raise ValueError(f"Unrecognised unary expression {n}")
 
     def _compile_async_expr(self, expr: nodes.Node):
         if not isinstance(expr, nodes.N_Call):
@@ -320,7 +317,7 @@ class CompileToplevel:
             self.compile_expr(expr)
             + [
                 mi.PushB.from_node(expr, mt.TlSymbol("-")),
-                mi.Call.from_node(expr, mt.TlInt(1))
+                mi.Call.from_node(expr, mt.TlInt(1)),
             ]
         ]
 
@@ -328,10 +325,8 @@ class CompileToplevel:
         if isinstance(expr, nodes.N_Literal):
             val = mt.to_teal_type(not expr.value)
             return [mi.PushV.from_node(expr, val)]
-        return [
-            *self.compile_expr(expr),
-            mi.Neg.from_node(expr, mt.TlInt(0))
-        ]
+        return [*self.compile_expr(expr), mi.Neg.from_node(expr, mt.TlInt(0))]
+
 
 ###
 

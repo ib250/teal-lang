@@ -197,7 +197,6 @@ class OpOr(I):
     pass
 
 
-
 class Neg(I):
     pass
 
