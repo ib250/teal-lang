@@ -311,7 +311,7 @@ class CompileToplevel:
 
     def _compile_negation_expr(self, expr: nodes.Node):
         if isinstance(expr, nodes.N_Literal):
-            val = mt.to_teal_type(-expr.value)
+            val = mt.to_hark_type(-expr.value)
             return [mi.PushV.from_node(expr, val)]
         return [
             self.compile_expr(expr)
@@ -323,7 +323,7 @@ class CompileToplevel:
 
     def _compile_boolean_negation(self, expr: nodes.Node):
         if isinstance(expr, nodes.N_Literal):
-            val = mt.to_teal_type(not expr.value)
+            val = mt.to_hark_type(not expr.value)
             return [mi.PushV.from_node(expr, val)]
         return [*self.compile_expr(expr), mi.Neg.from_node(expr, mt.TlInt(0))]
 

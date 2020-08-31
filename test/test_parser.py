@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from teal_lang.teal_parser import parser, nodes
+from hark_lang.hark_parser import parser, nodes
 
 
 @pytest.mark.parametrize(
@@ -48,11 +48,12 @@ def test_unaryop(test_case, source, op):
 
 def examples(root=None):
     root: Path = (root or Path(".")).absolute()
-    yield from root.glob("**/*.tl")
+    # TODO: find a better way of using existing hark code
+    yield from root.glob("**/examples/*.hk")
 
 
 @pytest.mark.parametrize(
-    "source_file", (p for p in examples() if p.name != "bad_syntax.tl")
+    "source_file", (p for p in examples() if p.name != "bad_syntax.hk")
 )
 def test_successful_code(source_file):
     with open(source_file) as f:
@@ -60,6 +61,6 @@ def test_successful_code(source_file):
 
 
 def test_bad_syntax():
-    bad_syntax = next(p for p in examples() if p.name == "bad_syntax.tl")
-    with open(bad_syntax) as f, pytest.raises(parser.TealParseError):
+    bad_syntax = next(p for p in examples() if p.name == "bad_syntax.hk")
+    with open(bad_syntax) as f, pytest.raises(parser.HarkParseError):
         parser.tl_parse(bad_syntax, f.read())
