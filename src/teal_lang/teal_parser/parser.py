@@ -210,15 +210,18 @@ class TealParser(Parser):
 
     tokens = TealLexer.tokens
     precedence = (
-        ("right", NEQ),
+        ("right", ASYNC),
+        ("right", SET),
+        ("left", OR),
+        ("left", AND),
+        ("left", NEQ, EQ),
         ("right", LTE, GTE),
         ("right", LT, GT),
-        ("right", AND, OR),
-        ("nonassoc", EQ, SET),
+        ("right", NOT),
         ("left", ADD, SUB),
         ("left", MUL, DIV, MOD),
+        ("right", AWAIT),
         ("right", "("),
-        ("right", ASYNC, AWAIT, NOT),
     )
 
     start = "top"
